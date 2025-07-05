@@ -9,25 +9,32 @@ form.addEventListener('submit', async (e) => {
 
   appendMessage('You', userMessage);
   input.value = '';
-  
+
   try {
-    const res = await fetch('/api/chat', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: userMessage }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: userMessage })
     });
 
-    const data = await res.json();
+    if (!response.ok) {
+      throw new Error('Server error');
+    }
+
+    const data = await response.json();
     appendMessage('Arcana', data.reply);
-  } catch (err) {
-    appendMessage('Arcana', 'Oops. Something went wrong.');
+  } catch (error) {
+    appendMessage('Arcana', '⚠️ I lost connection to the Logos. Try again.');
+    console.error(error);
   }
 });
 
 function appendMessage(sender, text) {
-  const message = document.createElement('div');
-  message.className = 'message';
-  message.innerHTML = `<strong>${sender}:</strong> ${text}`;
-  messages.appendChild(message);
+  const messageEl = document.createElement('div');
+  messageEl.className = 'message';
+  messageEl.innerHTML = `<strong>${sender}:</strong> ${text}`;
+  messages.appendChild(messageEl);
   messages.scrollTop = messages.scrollHeight;
 }
