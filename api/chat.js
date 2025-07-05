@@ -1,5 +1,3 @@
-// api/chat.js
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -21,15 +19,23 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: message }],
+        temperature: 0.7,
       }),
     });
 
     const data = await response.json();
 
-    const reply = data.choices?.[0]?.message?.content || "No response from OpenAI.";
+    // Log for debugging
+    console.log('OpenAI response:', JSON.stringify(data, null, 2));
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      return res.status(500).json({ reply: 'Arcana could not answer. No data received.' });
+    }
+
+    const reply = data.choices[0].message.content;
     res.status(200).json({ reply });
   } catch (error) {
-    console.error('API Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('OpenAI API error:', error);
+    res.status(500).json({ reply: 'Arcana encountered an error.' });
   }
 }
