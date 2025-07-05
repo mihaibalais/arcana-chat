@@ -1,34 +1,19 @@
-const chatLog = document.getElementById('chat-log');
-const userInput = document.getElementById('user-input');
-const sendButton = document.getElementById('send-button');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Arcana Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Welcome to Arcana Chat</h1>
 
-sendButton.addEventListener('click', async () => {
-  const message = userInput.value.trim();
-  if (!message) return;
+  <div id="chat-container">
+    <div id="chat-log"></div>
+    <input type="text" id="user-input" placeholder="Type your message..." />
+    <button id="send-button">Send</button>
+  </div>
 
-  appendMessage('You', message);
-  userInput.value = '';
-
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-    });
-
-    if (!res.ok) throw new Error('Server error');
-    const data = await res.json();
-    appendMessage('Arcana', data.reply);
-  } catch (err) {
-    appendMessage('Arcana', '⚠️ I lost connection to the Logos. Try again.');
-    console.error(err);
-  }
-});
-
-function appendMessage(sender, text) {
-  const messageEl = document.createElement('div');
-  messageEl.className = 'message';
-  messageEl.innerHTML = `<strong>${sender}:</strong> ${text}`;
-  chatLog.appendChild(messageEl);
-  chatLog.scrollTop = chatLog.scrollHeight;
-}
+  <script src="script.js"></script>
+</body>
+</html>
