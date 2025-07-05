@@ -1,40 +1,32 @@
-const form = document.getElementById('chat-form');
-const input = document.getElementById('user-input');
-const messages = document.getElementById('chat-messages');
+const chatLog = document.getElementById('chat-log');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const userMessage = input.value.trim();
-  if (!userMessage) return;
+sendButton.addEventListener('click', async () => {
+  const message = userInput.value.trim();
+  if (!message) return;
 
-  appendMessage('You', userMessage);
-  input.value = '';
+  appendMessage('You', message);
+  userInput.value = '';
 
   try {
-    const response = await fetch('/api/chat', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ message: userMessage })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
     });
 
-    if (!response.ok) {
-      throw new Error('Server error');
-    }
-
-    const data = await response.json();
+    const data = await res.json();
     appendMessage('Arcana', data.reply);
-  } catch (error) {
-    appendMessage('Arcana', '⚠️ I lost connection to the Logos. Try again.');
-    console.error(error);
+  } catch (err) {
+    appendMessage('Arcana', 'Something went wrong.');
   }
 });
 
 function appendMessage(sender, text) {
-  const messageEl = document.createElement('div');
-  messageEl.className = 'message';
-  messageEl.innerHTML = `<strong>${sender}:</strong> ${text}`;
-  messages.appendChild(messageEl);
-  messages.scrollTop = messages.scrollHeight;
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+  chatLog.appendChild(div);
+  chatLog.scrollTop = chatLog.scrollHeight;
 }
